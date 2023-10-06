@@ -38,11 +38,11 @@ class EmitterController extends AbstractController
      * Then it will dispatch the event as normal via the event dispatcher.
      *
      * @param       $eventName
-     * @param Event $event
+     * @param       $event
      *
      * @return Event
      */
-    protected function triggerMethod($eventName, Event $event)
+    protected function triggerMethod($eventName, $event)
     {
         $method = sprintf('on%s', Container::camelize(str_replace('.', '_', $eventName)));
 
