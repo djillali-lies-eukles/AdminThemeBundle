@@ -37,7 +37,7 @@ class FetchVendorCommand extends Command
 
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $kernel = $this->container->get('kernel');
         /** @var $kernel Kernel */
@@ -66,5 +66,6 @@ class FetchVendorCommand extends Command
         });
 
         $output->writeln($helper->formatSection('Done. You should now execute', 'php bin/console assets:install', 'comment'));
+        return Command::SUCCESS;
     }
 }

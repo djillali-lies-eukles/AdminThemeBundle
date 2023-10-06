@@ -88,7 +88,7 @@ class BuildAssetsCommand extends Command
         $this->pubdir = $this->resdir . '/public';
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var $kernel Kernel */
         $this->kernel = $this->container->get('kernel');
@@ -136,6 +136,7 @@ class BuildAssetsCommand extends Command
         {
             $output->writeln('No fonts found');
         }
+        return Command::SUCCESS;
     }
 
     protected function findFonts()

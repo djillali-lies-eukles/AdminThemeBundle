@@ -31,7 +31,7 @@ class CompactVendorCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         if (!$input->getOption('nojs')) {
             $this->compressVendorJs($output);
             $this->compressThemeJs($input, $output);
@@ -43,6 +43,7 @@ class CompactVendorCommand extends Command
 
         $this->copyFonts($input, $output);
         $this->copyImages($input, $output);
+        return Command::SUCCESS;
     }
 
     protected function getThemePath($type, InputInterface $input, $kernel) {

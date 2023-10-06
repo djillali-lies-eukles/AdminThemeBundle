@@ -35,7 +35,7 @@ class AvanzuAdminExtension extends AbstractExtension
         $this->aliasRouter = $aliasRouter;
     }
 
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('body_class', [$this, 'bodyClass']),
