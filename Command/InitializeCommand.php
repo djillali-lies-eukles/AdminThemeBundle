@@ -92,7 +92,13 @@ class InitializeCommand extends Command
      */
     protected function getDirectorySetup(InputInterface $input)
     {
-        $appDir = $this->container->getParameter('kernel.root_dir');
+        $appDir = NULL;
+        if ($this->container->hasParameter('kernel.project_dir')) {
+            $appDir = $this->container->getParameter('kernel.project_dir').'/src';
+        } else {
+            $appDir = $this->container->getParameter('kernel.root_dir');
+        }
+
         $projectDir = dirname($appDir);
         $vendors = $this->getVendorDir($input);
         $theme = $this->getThemeDir($input);

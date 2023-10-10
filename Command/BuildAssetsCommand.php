@@ -92,7 +92,15 @@ class BuildAssetsCommand extends Command
     {
         /** @var $kernel Kernel */
         $this->kernel = $this->container->get('kernel');
-        $this->webdir = realpath($this->container->getParameter('kernel.root_dir') . '/../web');
+
+        $webDirPath = NULL;
+        if ($this->container->hasParameter('kernel.project_dir')) {
+            $webDirPath = $this->container->getParameter('kernel.project_dir').'/web';
+        } else {
+            $webDirPath = $this->container->getParameter('kernel.root_dir').'/../web';
+        }
+
+        $this->webdir = realpath($webDirPath);
         $this->builddir = $this->pubdir . '/static/' . $input->getOption('env');
 
         $assetsFiles = $this->resdir . '/config/assets.php';
