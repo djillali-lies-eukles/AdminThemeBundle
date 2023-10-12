@@ -11,44 +11,48 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Process;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class FetchVendorCommand extends Command
 {
+    protected static $defaultName = 'avanzu:admin:fetch-vendor';
+    protected static $defaultDescription = 'Fetch vendor assets';
 
-    private $container;
+    /**
+     * @var KernelInterface
+     */
+    private $kernel;
 
-    public function __construct(ContainerInterface $container)
+    /**
+     * @var ParameterBagInterface
+     */
+    private $params;
+
+    public function __construct(KernelInterface $kernel, ParameterBagInterface $params)
     {
         parent::__construct();
-        $this->container = $container;
+        $this->kernel = $kernel;
+        $this->params = $params;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
-        $this->setName('avanzu:admin:fetch-vendor')
-            ->setDescription('Fetch vendor assets')
-            ->addOption('update', 'u', InputOption::VALUE_NONE, 'perform update instead of install')
+        $this->addOption('update', 'u', InputOption::VALUE_NONE, 'perform update instead of install')
             ->addOption('root', 'r', InputOption::VALUE_NONE, 'allow bower to run as root');
-        // ->addArgument('name', InputArgument::OPTIONAL, 'Who do you want to greet?')
-        // ->addOption('yell', null, InputOption::VALUE_NONE, 'If set, the task will yell in uppercase letters')
-
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $kernel = $this->container->get('kernel');
-        /** @var $kernel Kernel */
-        $bowerResource = $kernel->locateResource('@AvanzuAdminThemeBundle/Resources/bower');
+        $bowerResource = $this->kernel->locateResource('@AvanzuAdminThemeBundle/Resources/bower');
         $helper = $this->getHelperSet()->get('formatter');
         /** @var $helper FormatterHelper */
-        $bower = $this->container->getParameter('avanzu_admin_theme.bower_bin');
+        $bower = $this->params->get('avanzu_admin_theme.bower_bin');
 
         $action = $input->getOption('update') ? 'update' : 'install';
         $asRoot = $input->getOption('root') ? '--allow-root' : '';
-        $process = new Process($bower . ' ' . $action . ' ' . $asRoot);
+        $process = new Process([$bower, $action, $asRoot]);
         $process->setTimeout(600);
 
         $output->writeln($helper->formatSection('Executing', $process->getCommandLine(), 'comment'));

@@ -11,8 +11,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -24,6 +23,7 @@ class InitializeCommand extends Command
 {
 
     protected static $defaultName = 'avanzu:admin:initialize';
+    protected static $defaultDescription = 'Initialize the files needed for AdminLTE';
 
     const METHOD_COPY = 'copy';
 
@@ -32,71 +32,65 @@ class InitializeCommand extends Command
     const METHOD_RELATIVE_SYMLINK = 'relative symlink';
 
     /**
-     *
      * @var Filesystem
      */
     private $filesystem;
-    private $container;
-    private $kernel;
 
-    public function __construct(ContainerInterface $container, KernelInterface $kernel)
+    /**
+     * @var ParameterBagInterface
+     */
+    private $params;
+
+    public function __construct(Filesystem $filesystem, ParameterBagInterface $params)
     {
         parent::__construct();
-        $this->container = $container;
-        $this->kernel = $kernel;
+        $this->filesystem = $filesystem;
+        $this->params = $params;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
-        $this->setName('avanzu:admin:initialize')
-        ->setDescription('Initialize the files needed for AdminLTE')
-        ->addOption('vendor-dir', null, InputOption::VALUE_OPTIONAL, 'path to vendors', 'vendor')
-        ->addOption('theme-dir', null, InputOption::VALUE_OPTIONAL, 'path to adminlte', 'almasaeed2010/adminlte')
-        ->addOption('web-dir', null, InputOption::VALUE_OPTIONAL, 'path to public project directory', 'public')
-        ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
-        ->addOption('relative', null, InputOption::VALUE_NONE, 'Make relative symlinks');
+        $this->addOption('vendor-dir', null, InputOption::VALUE_OPTIONAL, 'path to vendors', 'vendor')
+            ->addOption('theme-dir', null, InputOption::VALUE_OPTIONAL, 'path to adminlte', 'almasaeed2010/adminlte')
+            ->addOption('web-dir', null, InputOption::VALUE_OPTIONAL, 'path to public project directory', 'public')
+            ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
+            ->addOption('relative', null, InputOption::VALUE_NONE, 'Make relative symlinks');
     }
 
     /**
      *
-     * @param
-     *            $appDir
      * @param InputInterface $input
      *
      * @return string
      */
-    protected function getVendorDir(InputInterface $input)
+    protected function getVendorDir(InputInterface $input): string
     {
         return $input->getOption('vendor-dir');
     }
 
     /**
      *
-     * @param
-     *            $appDir
      * @param InputInterface $input
      *
      * @return string
      */
-    protected function getThemeDir(InputInterface $input)
+    protected function getThemeDir(InputInterface $input): string
     {
         return sprintf('%s/%s', $this->getVendorDir($input), $input->getOption('theme-dir'));
     }
 
     /**
      *
-     * @param ContainerInterface $dic
      * @param InputInterface $input
      *
      * @return object
      */
     protected function getDirectorySetup(InputInterface $input)
     {
-        $appDir = NULL;
-        if ($this->container->hasParameter('kernel.project_dir')) {
-            $appDir = $this->container->getParameter('kernel.project_dir').'/src';
+        if ($this->params->has('kernel.project_dir')) {
+            $appDir = $this->params->get('kernel.project_dir').'/src';
         } else {
-            $appDir = $this->container->getParameter('kernel.root_dir');
+            $appDir = $this->params->get('kernel.root_dir');
         }
 
         $projectDir = dirname($appDir);
@@ -125,7 +119,7 @@ class InitializeCommand extends Command
      *
      * @return string
      */
-    protected function establishLink($originDir, $targetDir, $expectedMethod)
+    protected function establishLink($originDir, $targetDir, $expectedMethod): string
     {
         $this->filesystem->remove($targetDir);
 
@@ -150,15 +144,12 @@ class InitializeCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      *
-     * @return int|null|void
+     * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $dic = $this->container;
-        $fs = $dic->get('filesystem');
         $folders = $this->getDirectorySetup($input);
         $io = new SymfonyStyle($input, $output);
-        $this->filesystem = $fs;
 
         if($input->getOption('relative'))
         {
@@ -176,15 +167,15 @@ class InitializeCommand extends Command
             $io->text('Installing theme assets as <info>hard copies</info> in ' . $folders->public);
         }
 
-        $fs->mkdir($folders->public . '/theme');
+        $this->filesystem->mkdir($folders->public . '/theme');
 
         foreach([
-            'bootstrap',
-            'dist',
-            'plugins',
-            'documentation',
-            'starter.html'
-        ] as $directory)
+                    'bootstrap',
+                    'dist',
+                    'plugins',
+                    'documentation',
+                    'starter.html'
+                ] as $directory)
         {
             $io->text("installing <info>$directory</info>");
 
@@ -193,6 +184,7 @@ class InitializeCommand extends Command
 
             $this->establishLink($lnFrom, $lnTo, $expectedMethod);
         }
+        return Command::SUCCESS;
     }
 
     /**
@@ -205,7 +197,7 @@ class InitializeCommand extends Command
      *
      * @return string
      */
-    private function relativeSymlinkWithFallback($originDir, $targetDir)
+    private function relativeSymlinkWithFallback($originDir, $targetDir): string
     {
         try
         {
@@ -230,7 +222,7 @@ class InitializeCommand extends Command
      *
      * @return string
      */
-    private function absoluteSymlinkWithFallback($originDir, $targetDir)
+    private function absoluteSymlinkWithFallback($originDir, $targetDir): string
     {
         try
         {
@@ -255,7 +247,7 @@ class InitializeCommand extends Command
      *
      * @throws IOException If link can not be created.
      */
-    private function symlink($originDir, $targetDir, $relative = false)
+    private function symlink($originDir, $targetDir, $relative = false): void
     {
         if($relative)
         {
@@ -276,7 +268,7 @@ class InitializeCommand extends Command
      *
      * @return string
      */
-    private function hardCopy($originDir, $targetDir)
+    private function hardCopy($originDir, $targetDir): string
     {
         if(is_file($originDir))
         {

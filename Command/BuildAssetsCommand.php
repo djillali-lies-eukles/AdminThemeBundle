@@ -11,13 +11,12 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Process;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class BuildAssetsCommand extends Command
 {
@@ -27,36 +26,51 @@ class BuildAssetsCommand extends Command
     const DEFAULT_UGLIFY_CSS_LINUX = '/usr/bin/env uglifycss';
     const DEFAULT_UGLIFY_CSS_WIN   = 'uglifycss.exe';
 
+    protected static $defaultName = 'avanzu:admin:build-assets';
+    protected static $defaultDescription = 'Concatenate and Uglify asset groups to static files';
+
     /**
-     * @var Kernel
+     * @var Filesystem
      */
-    protected $kernel;
+    private $filesystem;
+
+    /**
+     * @var KernelInterface
+     */
+    private $kernel;
+
+    /**
+     * @var ParameterBagInterface
+     */
+    private $params;
 
     /**
      * @var string
      */
     protected $resdir;
+
     /**
      * @var string
      */
     protected $pubdir;
+
     /**
-     * @var
+     * @var string
      */
     protected $webdir;
 
     protected $builddir;
 
-    private $container;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(Filesystem $filesystem, KernelInterface $kernel, ParameterBagInterface $params)
     {
         parent::__construct();
-        $this->container = $container;
+        $this->filesystem = $filesystem;
+        $this->kernel = $kernel;
+        $this->params = $params;
     }
 
 
-    protected function configure()
+    protected function configure(): void
     {
         if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
         {
@@ -76,12 +90,10 @@ class BuildAssetsCommand extends Command
             $uglifycss_default_option = self::DEFAULT_UGLIFY_CSS_LINUX;
         }
 
-        $this->setName('avanzu:admin:build-assets')
-        ->setDescription('Concatenate and Uglify asset groups to static files')
-        ->addOption('compress', 'c', InputOption::VALUE_NONE, 'compress javascripts')
-        ->addOption('mangle', 'm', InputOption::VALUE_NONE, 'mangle javascripts')
-        ->addOption('uglifyjs-bin', false, InputOption::VALUE_OPTIONAL, 'uglifyjs binary', $uglifyjs_default_option)
-        ->addOption('uglifycss-bin', false, InputOption::VALUE_OPTIONAL, 'uglifycss binary', $uglifycss_default_option)
+        $this->addOption('compress', 'c', InputOption::VALUE_NONE, 'compress javascripts')
+            ->addOption('mangle', 'm', InputOption::VALUE_NONE, 'mangle javascripts')
+            ->addOption('uglifyjs-bin', false, InputOption::VALUE_OPTIONAL, 'uglifyjs binary', $uglifyjs_default_option)
+            ->addOption('uglifycss-bin', false, InputOption::VALUE_OPTIONAL, 'uglifycss binary', $uglifycss_default_option)
         ;
 
         $this->resdir = realpath(dirname(__FILE__) . '/../Resources');
@@ -90,14 +102,11 @@ class BuildAssetsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var $kernel Kernel */
-        $this->kernel = $this->container->get('kernel');
-
         $webDirPath = NULL;
-        if ($this->container->hasParameter('kernel.project_dir')) {
-            $webDirPath = $this->container->getParameter('kernel.project_dir').'/web';
+        if ($this->params->has('kernel.project_dir')) {
+            $webDirPath = $this->params->get('kernel.project_dir').'/web';
         } else {
-            $webDirPath = $this->container->getParameter('kernel.root_dir').'/../web';
+            $webDirPath = $this->params->get('kernel.root_dir').'/../web';
         }
 
         $this->webdir = realpath($webDirPath);
@@ -107,28 +116,27 @@ class BuildAssetsCommand extends Command
         $output->writeln('Loading assets files config from ' . $assetsFiles);
 
         $assets = $this->partition($this->resolveAll(include($assetsFiles)));
-        $fs = new Filesystem();
 
         $output->writeln('Processing scripts');
         foreach($assets['scripts'] as $group => $files)
         {
-            $this->processScript($group, $files, $fs, $input, $output);
+            $this->processScript($group, $files, $input, $output);
         }
 
         $output->writeln('Processing styles');
         foreach($assets['styles'] as $group => $files) {
-            $this->processStyle($group, $files, $fs, $input, $output);
+            $this->processStyle($group, $files, $input, $output);
         }
 
         $output->writeln('Processing styles');
         foreach($assets['fonts'] as $group => $files) {
-            $this->processFonts($group, $files, $fs, $input, $output);
+            $this->processFonts($group, $files, $input, $output);
         }
 
         $fontsdir = $this->builddir . '/fonts';
         $output->writeln('Searching for fonts under ' . $fontsdir);
 
-        $fs->exists($fontsdir) or $fs->mkdir($fontsdir);
+        $this->filesystem->exists($fontsdir) or $this->filesystem->mkdir($fontsdir);
 
         $fontsFound = $this->findFonts();
 
@@ -137,7 +145,7 @@ class BuildAssetsCommand extends Command
             foreach($fontsFound as $name => $path)
             {
                 $output->writeln('Font found: ' . $name . ' in ' . $path);
-                $fs->copy($path, "$fontsdir/$name");
+                $this->filesystem->copy($path, "$fontsdir/$name");
             }
         }
         else
@@ -147,7 +155,7 @@ class BuildAssetsCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function findFonts()
+    protected function findFonts(): array
     {
         $finder = new Finder();
         $finder->files()->in("$this->pubdir")->path('/fonts');
@@ -164,17 +172,16 @@ class BuildAssetsCommand extends Command
 
     /**
      * @param $name
-     * @param $files
-     * @param Filesystem      $fs
-     * @param InputInterface  $in
+     * @param array $files
+     * @param InputInterface $in
      * @param OutputInterface $out
      */
-    protected function processScript($name, $files, $fs, $in, $out)
+    protected function processScript($name, array $files, InputInterface $in, OutputInterface $out): void
     {
         $dir = $this->builddir . '/scripts/';
         $file = $dir . $this->group2file($name, '.js');
 
-        $fs->exists($dir) or $fs->mkdir($dir);
+        $this->filesystem->exists($dir) or $this->filesystem->mkdir($dir);
 
         $command = [$in->getOption('uglifyjs-bin')];
         if($in->getOption('compress'))
@@ -185,7 +192,7 @@ class BuildAssetsCommand extends Command
                 $command[] = "-o $file";
                 $command[] = implode(' ', $files);
 
-                $proc = new Process(implode(' ', $command));
+                $proc = new Process($command);
 
                 $out->writeln($proc->getCommandLine() . PHP_EOL);
                 $proc->run(function ($type, $buffer) use ($in, $out) {
@@ -197,18 +204,25 @@ class BuildAssetsCommand extends Command
                 });
     }
 
-    protected function processStyle($name, $files, $fs, $in, $out)
+    /**
+     *
+     * @param unknown $name
+     * @param array $files
+     * @param InputInterface $in
+     * @param OutputInterface $out
+     */
+    protected function processStyle($name, array $files, InputInterface $in, OutputInterface $out): void
     {
         $dir = $this->builddir . '/styles/';
         $file = $dir . $this->group2file($name, '.css');
 
-        $fs->exists($dir) or $fs->mkdir($dir);
+        $this->filesystem->exists($dir) or $this->filesystem->mkdir($dir);
 
         $command = [$in->getOption('uglifycss-bin')];
         $command[] = implode(' ', $files);
         $command[] = "> $file";
 
-        $proc = new Process(implode(' ', $command));
+        $proc = new Process($command);
 
         $out->writeln($proc->getCommandLine() . PHP_EOL);
         $proc->run(function ($type, $buffer) use ($in, $out) {
@@ -223,22 +237,21 @@ class BuildAssetsCommand extends Command
     /**
      *
      * @param unknown $name
-     * @param unknown $files
-     * @param unknown $fs
-     * @param unknown $in
-     * @param unknown $out
+     * @param array $files
+     * @param InputInterface $in
+     * @param OutputInterface $out
      */
-    protected function processFonts($name, $files, $fs, $in, $out)
+    protected function processFonts($name, array $files, InputInterface $in, OutputInterface $out): void
     {
         $dir = $this->builddir . '/fonts/';
 
-        $fs->exists($dir) or $fs->mkdir($dir);
+        $this->filesystem->exists($dir) or $this->filesystem->mkdir($dir);
 
         if(!empty($files))
         {
             foreach($files as $file)
             {
-                $fs->copy($file, $dir . basename($file));
+                $this->filesystem->copy($file, $dir . basename($file));
             }
         }
     }
@@ -248,17 +261,17 @@ class BuildAssetsCommand extends Command
         return str_replace('_', '-', preg_replace('!(_js|_css)$!', '', $name)) . $extension;
     }
 
-    protected function endsWith($extension, $file)
+    protected function endsWith(string $extension, string $file): bool
     {
         return strrpos($file, $extension) === (strlen($file) - strlen($extension));
     }
 
-    protected function isImage($file)
+    protected function isImage(string $file): bool
     {
         return strpos(mime_content_type($file), 'image/') === 0;
     }
 
-    protected function resolveAll($assets)
+    protected function resolveAll($assets): array
     {
         $resolved = [];
 
@@ -279,9 +292,9 @@ class BuildAssetsCommand extends Command
      *
      * @param array $resolved
      *
-     * @return array[]|unknown
+     * @return array[]
      */
-    protected function partition($resolved)
+    protected function partition(array $resolved): array
     {
         echo 'Partitioning assets in groups ' . PHP_EOL;
 
@@ -309,29 +322,15 @@ class BuildAssetsCommand extends Command
                         $grouped['images'][$group][] = $file;
                         break;
 
-                        // Fonts
-                    case $this->endsWith('.otf', $file):
-                        $grouped['fonts'][$group][] = $file;
-                        break;
+                    // Fonts
                     case $this->endsWith('.eot', $file):
-                        $grouped['fonts'][$group][] = $file;
-                        break;
                     case $this->endsWith('.otf', $file):
-                        $grouped['fonts'][$group][] = $file;
-                        break;
+                    case $this->endsWith('.woff', $file):
+                    case $this->endsWith('.woff2', $file):
                     case $this->endsWith('.svg', $file):
-                        $grouped['fonts'][$group][] = $file;
-                        break;
                     case $this->endsWith('.ttf', $file):
                         $grouped['fonts'][$group][] = $file;
                         break;
-                    case $this->endsWith('.woff', $file):
-                        $grouped['fonts'][$group][] = $file;
-                        break;
-                    case $this->endsWith('.woff2', $file):
-                        $grouped['fonts'][$group][] = $file;
-                        break;
-
                     default:
                         $grouped['files'][$group][] = $file;
                         break;
@@ -344,7 +343,7 @@ class BuildAssetsCommand extends Command
         return $grouped;
     }
 
-    protected function resolve($groups, $input)
+    protected function resolve($groups, $input): array
     {
         $resolved = [];
         if(strpos($input, '@') === false) {
