@@ -9,22 +9,11 @@ namespace Avanzu\AdminThemeBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 
 class EmitterController extends AbstractController
 {
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
-
-    public function __construct(EventDispatcherInterface $eventDispatcher){
-        parent::__construct();
-        $this->eventDispatcher = $eventDispatcher;
-    }
-
     /**
      * Will look for a method of the format "on<CamelizedEventName>" and call it with the event as argument.
      *
@@ -48,7 +37,8 @@ class EmitterController extends AbstractController
             return $event;
         }
 
-        $this->eventDispatcher->dispatch($event, $eventName);
+        $dispatcher = new EventDispatcher();
+        $dispatcher->dispatch($event, $eventName);
         return $event;
     }
 }

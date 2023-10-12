@@ -24,11 +24,12 @@ class NavbarController extends EmitterController
 
     public function notificationsAction($max = self::MAX_NOTIFICATIONS): Response
     {
-        if (!$this->eventDispatcher->hasListeners(ThemeEvents::THEME_NOTIFICATIONS)) {
+        $eventDispatcher = new EventDispatcher();
+        if (!$eventDispatcher->hasListeners(ThemeEvents::THEME_NOTIFICATIONS)) {
             return new Response();
         }
 
-        $listEvent = $this->eventDispatcher->dispatch(new NotificationListEvent(), ThemeEvents::THEME_NOTIFICATIONS);
+        $listEvent = $eventDispatcher->dispatch(new NotificationListEvent(), ThemeEvents::THEME_NOTIFICATIONS);
 
         return $this->render(
                     '@AvanzuAdminTheme/Navbar/notifications.html.twig',
@@ -46,11 +47,12 @@ class NavbarController extends EmitterController
      */
     public function messagesAction($max = self::MAX_MESSAGES): Response
     {
-        if (!$this->eventDispatcher->hasListeners(ThemeEvents::THEME_MESSAGES)) {
+        $eventDispatcher = new EventDispatcher();
+        if (!$eventDispatcher->hasListeners(ThemeEvents::THEME_MESSAGES)) {
             return new Response();
         }
 
-        $listEvent = $this->eventDispatcher->dispatch(new MessageListEvent(), ThemeEvents::THEME_MESSAGES);
+        $listEvent = $eventDispatcher->dispatch(new MessageListEvent(), ThemeEvents::THEME_MESSAGES);
 
         return $this->render(
                     '@AvanzuAdminTheme/Navbar/messages.html.twig',
@@ -68,7 +70,8 @@ class NavbarController extends EmitterController
      */
     public function tasksAction($max = self::MAX_TASKS): Response
     {
-        if (!$this->eventDispatcher->hasListeners(ThemeEvents::THEME_TASKS)) {
+        $eventDispatcher = new EventDispatcher();
+        if (!$eventDispatcher->hasListeners(ThemeEvents::THEME_TASKS)) {
             return new Response();
         }
 
@@ -88,7 +91,8 @@ class NavbarController extends EmitterController
      */
     public function userAction(): Response
     {
-        if (!$this->eventDispatcher->hasListeners(ThemeEvents::THEME_NAVBAR_USER)) {
+        $eventDispatcher = new EventDispatcher();
+        if (!$eventDispatcher->hasListeners(ThemeEvents::THEME_NAVBAR_USER)) {
             return new Response();
         }
 
