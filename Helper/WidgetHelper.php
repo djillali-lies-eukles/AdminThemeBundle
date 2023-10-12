@@ -9,7 +9,7 @@ namespace Avanzu\AdminThemeBundle\Helper;
 
 class WidgetHelper extends \Twig_Extension
 {
-    public function getName()
+    public function getName(): string
     {
         return 'widget';
     }

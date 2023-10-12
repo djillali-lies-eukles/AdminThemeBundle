@@ -7,6 +7,7 @@
 
 namespace Avanzu\AdminThemeBundle\Model;
 
+use DateTime;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -19,55 +20,62 @@ class FormDemoModel
     /**
      * @var string
      */
-    protected $gender;
-    /**
-     * @var string
-     */
-    protected $someOption;
-    /**
-     * @var string
-     */
-    protected $someChoices;
-    /**
-     * @var string
-     */
-    protected $username;
+    protected string $gender;
 
     /**
      * @var string
      */
-    protected $email;
+    protected string $someOption;
+
+    /**
+     * @var string
+     */
+    protected string $someChoices;
+
+    /**
+     * @var string
+     */
+    protected string $username;
+
+    /**
+     * @var string
+     */
+    protected string $email;
 
     /**
      * @var bool
      */
-    protected $termsAccepted;
+    protected bool $termsAccepted;
+
     /**
      * @var string
      */
-    protected $message;
+    protected string $message;
+
     /**
      * @var float
      */
-    protected $price;
+    protected float $price;
+
     /**
-     * @var \DateTime
+     * @var DateTime
      */
-    protected $date;
+    protected DateTime $date;
+
     /**
-     * @var \DateTime
+     * @var DateTime
      */
-    protected $time;
+    protected DateTime $time;
 
     /**
      * @var UploadedFile
      */
-    protected $file;
+    protected UploadedFile $file;
 
     /**
-     * @param mixed $email
+     * @param string $email
      */
-    public function setEmail($email)
+    public function setEmail($email): void
     {
         $this->email = $email;
     }
@@ -75,7 +83,7 @@ class FormDemoModel
     /**
      * @return mixed
      */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -83,7 +91,7 @@ class FormDemoModel
     /**
      * @param mixed $gender
      */
-    public function setGender($gender)
+    public function setGender($gender): void
     {
         $this->gender = $gender;
     }
@@ -91,7 +99,7 @@ class FormDemoModel
     /**
      * @return mixed
      */
-    public function getGender()
+    public function getGender(): string
     {
         return $this->gender;
     }
@@ -99,7 +107,7 @@ class FormDemoModel
     /**
      * @param mixed $message
      */
-    public function setMessage($message)
+    public function setMessage($message): void
     {
         $this->message = $message;
     }
@@ -107,7 +115,7 @@ class FormDemoModel
     /**
      * @return mixed
      */
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }
@@ -115,7 +123,7 @@ class FormDemoModel
     /**
      * @param mixed $someChoices
      */
-    public function setSomeChoices($someChoices)
+    public function setSomeChoices($someChoices): void
     {
         $this->someChoices = $someChoices;
     }
@@ -123,7 +131,7 @@ class FormDemoModel
     /**
      * @return mixed
      */
-    public function getSomeChoices()
+    public function getSomeChoices(): string
     {
         return $this->someChoices;
     }
@@ -131,7 +139,7 @@ class FormDemoModel
     /**
      * @param mixed $someOption
      */
-    public function setSomeOption($someOption)
+    public function setSomeOption($someOption): void
     {
         $this->someOption = $someOption;
     }
@@ -139,7 +147,7 @@ class FormDemoModel
     /**
      * @return mixed
      */
-    public function getSomeOption()
+    public function getSomeOption(): string
     {
         return $this->someOption;
     }
@@ -147,7 +155,7 @@ class FormDemoModel
     /**
      * @param mixed $termsAccepted
      */
-    public function setTermsAccepted($termsAccepted)
+    public function setTermsAccepted($termsAccepted): void
     {
         $this->termsAccepted = $termsAccepted;
     }
@@ -155,7 +163,7 @@ class FormDemoModel
     /**
      * @return mixed
      */
-    public function getTermsAccepted()
+    public function getTermsAccepted(): bool
     {
         return $this->termsAccepted;
     }
@@ -163,7 +171,7 @@ class FormDemoModel
     /**
      * @param mixed $username
      */
-    public function setUsername($username)
+    public function setUsername($username): void
     {
         $this->username = $username;
     }
@@ -171,7 +179,7 @@ class FormDemoModel
     /**
      * @return mixed
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
@@ -179,7 +187,7 @@ class FormDemoModel
     /**
      * @param mixed $price
      */
-    public function setPrice($price)
+    public function setPrice($price): void
     {
         $this->price = $price;
     }
@@ -187,7 +195,7 @@ class FormDemoModel
     /**
      * @return mixed
      */
-    public function getPrice()
+    public function getPrice(): float
     {
         return $this->price;
     }
@@ -195,7 +203,7 @@ class FormDemoModel
     /**
      * @param mixed $date
      */
-    public function setDate($date)
+    public function setDate($date): void
     {
         $this->date = $date;
     }
@@ -203,7 +211,7 @@ class FormDemoModel
     /**
      * @return mixed
      */
-    public function getDate()
+    public function getDate(): DateTime
     {
         return $this->date;
     }
@@ -211,7 +219,7 @@ class FormDemoModel
     /**
      * @param mixed $time
      */
-    public function setTime($time)
+    public function setTime($time): void
     {
         $this->time = $time;
     }
@@ -219,27 +227,26 @@ class FormDemoModel
     /**
      * @return mixed
      */
-    public function getTime()
+    public function getTime(): DateTime
     {
         return $this->time;
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
+     * @param UploadedFile $file
      *
      * @return $this
      */
-    public function setFile($file)
+    public function setFile($file): self
     {
         $this->file = $file;
-
         return $this;
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
+     * @return UploadedFile
      */
-    public function getFile()
+    public function getFile(): UploadedFile
     {
         return $this->file;
     }

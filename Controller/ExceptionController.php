@@ -21,7 +21,7 @@ class ExceptionController extends ErrorController
      *
      * @return TemplateReference
      */
-    protected function findTemplate(Request $request, $format, $code, $debug)
+    protected function findTemplate(Request $request, $format, $code, $debug): TemplateReference
     {
         if(strpos($request->getPathInfo(), '/admin') !== 0) {
             return parent::findTemplate($request, $format, $code, $debug);

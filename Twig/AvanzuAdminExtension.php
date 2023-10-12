@@ -43,7 +43,7 @@ class AvanzuAdminExtension extends AbstractExtension
         ];
     }
 
-    public function bodyClass($classes = '')
+    public function bodyClass($classes = ''): string
     {
         $classList = [$classes];
         $options = $this->options;
@@ -57,7 +57,7 @@ class AvanzuAdminExtension extends AbstractExtension
         return implode(' ', array_filter($classList));
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'avanzu_admin';
     }

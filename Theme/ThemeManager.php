@@ -8,29 +8,21 @@
 namespace Avanzu\AdminThemeBundle\Theme;
 
 use Avanzu\FoundationBundle\Util\DependencyResolverInterface;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpKernel\Config\FileLocator;
 
 class ThemeManager
 {
-    /** @var  Container */
-    protected $container;
+    protected array $stylesheets = [];
 
-    protected $stylesheets = [];
-
-    protected $javascripts = [];
-
-    protected $locations = [];
+    protected array $javascripts = [];
 
     protected $resolverClass;
 
-    public function __construct($container, $resolverClass = null)
+    public function __construct($resolverClass = null)
     {
-        $this->container = $container;
         $this->resolverClass = $resolverClass ?: 'Avanzu\AdminThemeBundle\Util\DependencyResolver';
     }
 
-    public function registerScript($id, $src, $deps = [], $location = 'bottom')
+    public function registerScript($id, $src, $deps = [], $location = 'bottom'): void
     {
         if (!isset($this->javascripts[$id])) {
             $this->javascripts[$id] = [
@@ -41,7 +33,8 @@ class ThemeManager
         }
     }
 
-    public function registerStyle($id, $src, $deps = []) {
+    public function registerStyle($id, $src, $deps = []): void
+    {
         if(!isset($this->stylesheets[$id])) {
             $this->stylesheets[$id] = [
                 'src' => $src,
@@ -50,7 +43,8 @@ class ThemeManager
         }
     }
 
-    public function getScripts($location = 'bottom') {
+    public function getScripts($location = 'bottom'): array
+    {
         $unsorted = [];
         $srcList = [];
 
@@ -68,7 +62,8 @@ class ThemeManager
         return $srcList;
     }
 
-    public function getStyles() {
+    public function getStyles(): array
+    {
         $srcList = [];
         $queue = $this->getResolver()->register($this->stylesheets)->resolveAll();
         foreach($queue as $def){
@@ -81,16 +76,9 @@ class ThemeManager
     /**
      * @return DependencyResolverInterface
      */
-    protected function getResolver() {
+    protected function getResolver(): DependencyResolverInterface
+    {
         $class = $this->resolverClass;
-
         return new $class();
-    }
-
-    /**
-     * @return FileLocator
-     */
-    protected function getLocator() {
-        return $this->container->get('file_locator');
     }
 }

@@ -59,7 +59,7 @@ class MenuBuilder
         ];
 
         $this->eventDispatcher->dispatch(
-            new KnpMenuEvent($menu, $this->factory, $options, $childOptions)
+            new KnpMenuEvent($menu, $this->factory, $options, $childOptions),
             ThemeEvents::THEME_SIDEBAR_SETUP_KNP_MENU
         );
 

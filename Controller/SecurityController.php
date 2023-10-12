@@ -9,6 +9,7 @@ namespace Avanzu\AdminThemeBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\SecurityContext;
 
 class SecurityController extends AbstractController
@@ -18,7 +19,7 @@ class SecurityController extends AbstractController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function loginAction(Request $request)
+    public function loginAction(Request $request): Response
     {
         $session = $request->getSession();
 

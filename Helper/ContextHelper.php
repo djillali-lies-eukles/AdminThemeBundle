@@ -46,7 +46,7 @@ class ContextHelper extends \ArrayObject
      *
      * @param array $config The data under avanzu_admin_theme.options config
      */
-    protected function initialize(array $config = [])
+    protected function initialize(array $config = []): void
     {
         // Create a resolve and configure the defaults
         $resolver = new OptionsResolver();
@@ -72,7 +72,7 @@ class ContextHelper extends \ArrayObject
      *
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->getArrayCopy();
     }
@@ -83,7 +83,7 @@ class ContextHelper extends \ArrayObject
      *
      * @return $this
      */
-    public function setOption($name, $value)
+    public function setOption($name, $value): self
     {
         $this->offsetSet($name, $value);
 
@@ -95,7 +95,7 @@ class ContextHelper extends \ArrayObject
      *
      * @return bool
      */
-    public function hasOption($name)
+    public function hasOption($name): bool
     {
         return $this->offsetExists($name);
     }
@@ -116,7 +116,7 @@ class ContextHelper extends \ArrayObject
      *
      * @return bool
      */
-    public function hasAlias($name)
+    public function hasAlias($name): bool
     {
         return $this->router->hasAlias($name);
     }
@@ -134,7 +134,7 @@ class ContextHelper extends \ArrayObject
     /**
      * @param OptionsResolver $resolver
      */
-    protected function configureDefaults(OptionsResolver $resolver)
+    protected function configureDefaults(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'use_twig' => true,

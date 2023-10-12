@@ -11,6 +11,7 @@ use Avanzu\AdminThemeBundle\Event\SidebarMenuEvent;
 use Avanzu\AdminThemeBundle\Event\ThemeEvents;
 use Avanzu\AdminThemeBundle\Model\MenuItemInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -33,12 +34,13 @@ class BreadcrumbController extends AbstractController
      * @return Response
      *
      */
-    public function breadcrumbAction(Request $request, $title = '') {
-        if (!$this->getDispatcher()->hasListeners(ThemeEvents::THEME_BREADCRUMB)) {
+    public function breadcrumbAction(Request $request, $title = '', EventDispatcherInterface $eventDispatcher): Response
+    {
+        if (!$eventDispatcher->hasListeners(ThemeEvents::THEME_BREADCRUMB)) {
             return new Response();
         }
 
-        $active = $this->getDispatcher()->dispatch(new SidebarMenuEvent($request), ThemeEvents::THEME_BREADCRUMB)->getActive();
+        $active = $eventDispatcher->dispatch(new SidebarMenuEvent($request), ThemeEvents::THEME_BREADCRUMB)->getActive();
         /** @var $active MenuItemInterface */
         $list = [];
         if($active) {
@@ -53,13 +55,5 @@ class BreadcrumbController extends AbstractController
                 'active' => $list,
                 'title' => $title,
             ]);
-    }
-
-    /**
-     * @return EventDispatcher
-     */
-    protected function getDispatcher()
-    {
-        return $this->get('event_dispatcher');
     }
 }

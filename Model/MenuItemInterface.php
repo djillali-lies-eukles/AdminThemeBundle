@@ -91,7 +91,7 @@ interface MenuItemInterface
     public function hasParent();
 
     /**
-     * @param MenuItemInterface $parent
+     * @param MenuItemInterface|null $parent
      *
      * @return mixed
      */

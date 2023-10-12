@@ -14,10 +14,10 @@ interface DependencyResolverInterface
      *
      * @return $this
      */
-    public function register($items);
+    public function register($items): self;
 
     /**
      * @return array
      */
-    public function resolveAll();
+    public function resolveAll(): array;
 }

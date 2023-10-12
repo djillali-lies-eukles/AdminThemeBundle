@@ -17,36 +17,35 @@ class DependencyResolver implements DependencyResolverInterface
     /**
      * @var array
      */
-    protected $queued = [];
+    protected array $queued = [];
     /**
      * @var array
      */
-    protected $registered = [];
+    protected array $registered = [];
     /**
      * @var array
      */
-    protected $resolved = [];
+    protected array $resolved = [];
     /**
      * @var array
      */
-    protected $unresolved = [];
+    protected array $unresolved = [];
 
     /**
      * @param $items
      *
      * @return $this
      */
-    public function register($items)
+    public function register($items): self
     {
         $this->registered = $items;
-
         return $this;
     }
 
     /**
      * @return array
      */
-    public function resolveAll()
+    public function resolveAll(): array
     {
         $this->failOnCircularDependencies();
         $this->resolve(array_keys($this->registered));
@@ -57,7 +56,7 @@ class DependencyResolver implements DependencyResolverInterface
     /**
      * @param $ids
      */
-    protected function resolve($ids)
+    protected function resolve($ids): void
     {
         foreach ($ids as $id) {
             if (isset($this->resolved[$id])) {
@@ -93,7 +92,7 @@ class DependencyResolver implements DependencyResolverInterface
      *
      * @return array
      */
-    protected function unresolved($deps)
+    protected function unresolved($deps): array
     {
         return array_diff($deps, array_keys($this->resolved));
     }
@@ -103,7 +102,7 @@ class DependencyResolver implements DependencyResolverInterface
      *
      * @return bool
      */
-    protected function hasDependencies($id)
+    protected function hasDependencies($id): bool
     {
         if (!isset($this->registered[$id])) {
             return false;
@@ -132,7 +131,7 @@ class DependencyResolver implements DependencyResolverInterface
      *
      * @return bool
      */
-    protected function contains($needle, $haystackId)
+    protected function contains($needle, $haystackId): bool
     {
         $deps = $this->getDependencies($haystackId);
         if (!is_array($deps)) {
@@ -145,7 +144,7 @@ class DependencyResolver implements DependencyResolverInterface
     /**
      * @throws \RuntimeException
      */
-    protected function failOnCircularDependencies()
+    protected function failOnCircularDependencies(): void
     {
         $ids = array_keys($this->registered);
 

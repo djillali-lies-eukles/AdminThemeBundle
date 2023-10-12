@@ -9,26 +9,20 @@ namespace Avanzu\AdminThemeBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 class EmitterController extends AbstractController
 {
-    /**
-     * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher|\Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher
-     */
-    protected function getDispatcher()
-    {
-        return $this->get('event_dispatcher');
-    }
 
     /**
-     * @param $eventName
-     *
-     * @return bool
+     * @var EventDispatcherInterface
      */
-    protected function hasListener($eventName)
-    {
-        return $this->getDispatcher()->hasListeners($eventName);
+    protected $eventDispatcher;
+
+    public function __construct(EventDispatcherInterface $eventDispatcher){
+        parent::__construct();
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -54,8 +48,7 @@ class EmitterController extends AbstractController
             return $event;
         }
 
-        $this->getDispatcher()->dispatch($event, $eventName);
-
+        $this->eventDispatcher->dispatch($event, $eventName);
         return $event;
     }
 }

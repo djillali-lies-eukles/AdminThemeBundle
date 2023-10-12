@@ -17,32 +17,32 @@ class RouteAliasCollection
     /**
      * @var string
      */
-    protected $cacheDir;
+    protected string $cacheDir;
 
     /**
      * @var RouterInterface
      */
-    protected $router;
+    protected RouterInterface $router;
 
     /**
-     * @var array
+     * @var array|null
      */
-    protected $routeAliases = null;
-
-    /**
-     * @var string
-     */
-    protected $optionName;
+    protected ?array $routeAliases = null;
 
     /**
      * @var string
      */
-    protected $env;
+    protected string $optionName;
+
+    /**
+     * @var string
+     */
+    protected string $env;
 
     /**
      * @var boolean
      */
-    private $debug;
+    private bool $debug;
 
     /**
      * RouteAliasCollection constructor.
@@ -65,7 +65,7 @@ class RouteAliasCollection
     /**
      * @return string
      */
-    protected function getCacheFileName()
+    protected function getCacheFileName(): string
     {
         return sprintf(
             '%s/AliasRoutes/%s%s.php',
@@ -78,7 +78,7 @@ class RouteAliasCollection
     /**
      * @return \Symfony\Component\Config\Resource\ResourceInterface[]
      */
-    public function getResources()
+    public function getResources(): array
     {
         return $this->router->getRouteCollection()->getResources();
     }
@@ -88,10 +88,9 @@ class RouteAliasCollection
      *
      * @return bool
      */
-    public function hasAlias($name)
+    public function hasAlias($name): bool
     {
         $aliases = $this->getAliases();
-
         return isset($aliases[$name]);
     }
 
@@ -103,7 +102,6 @@ class RouteAliasCollection
     public function getRouteByAlias($name)
     {
         $aliases = $this->getAliases();
-
         return isset($aliases[$name]) ? $aliases[$name] : NULL;
     }
 
@@ -117,7 +115,6 @@ class RouteAliasCollection
         }
 
         $cache = new ConfigCache($this->getCacheFileName(), $this->debug);
-
         if  ($cache->isFresh()) {
             $this->routeAliases = unserialize(file_get_contents($cache->getPath()));
 
@@ -126,14 +123,13 @@ class RouteAliasCollection
 
         $this->routeAliases = $this->loadRoutes();
         $cache->write(serialize($this->routeAliases), $this->getResources());
-
         return $this->routeAliases;
     }
 
     /**
      * @return array
      */
-    protected function loadRoutes()
+    protected function loadRoutes(): array
     {
         $aliases = [];
         foreach($this->router->getRouteCollection()->all() as $name => $candidate) {
@@ -143,7 +139,6 @@ class RouteAliasCollection
 
             $aliases[$candidate->getOption($this->optionName)] = $name;
         }
-
         return $aliases;
     }
 
@@ -152,12 +147,11 @@ class RouteAliasCollection
      *
      * @return bool
      */
-    public function hasConfiguredOption(Route $route)
+    public function hasConfiguredOption(Route $route): bool
     {
         if(!$route->hasOption($this->optionName)) {
             return false;
         }
-
         return true;
     }
 }

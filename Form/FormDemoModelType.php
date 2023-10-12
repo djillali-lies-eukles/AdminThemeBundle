@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormDemoModelType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $options = [
             'This is option 1' => 'opt1',
@@ -47,7 +47,7 @@ class FormDemoModelType extends AbstractType
         ;
     }
 
-    public function setDefaultOptions(OptionsResolver $resolver)
+    public function setDefaultOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
                 'data_class' => 'Avanzu\AdminThemeBundle\Model\FormDemoModel',
@@ -59,7 +59,7 @@ class FormDemoModelType extends AbstractType
      *
      * @return string The name of this type
      */
-    public function getName()
+    public function getName(): string
     {
         return 'form_demo';
     }

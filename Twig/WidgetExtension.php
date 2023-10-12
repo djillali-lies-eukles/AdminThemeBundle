@@ -15,7 +15,7 @@ class WidgetExtension extends AbstractExtension
     public function renderWidget() {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             'widget_box' => new TwigFilter('widget_box',
@@ -27,7 +27,7 @@ class WidgetExtension extends AbstractExtension
         ];
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'avanzu_widget';
     }
