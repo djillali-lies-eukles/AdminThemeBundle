@@ -22,10 +22,10 @@ class RouteAliasCollection
     public function __construct(
         protected string $cacheDir,
         protected RouterInterface $router,
-        protected ?array $routeAliases = null,
         protected string $optionName,
         protected string $env,
-        private bool $debug
+        private bool $debug,
+        protected ?array $routeAliases = null
     ){
     }
 
