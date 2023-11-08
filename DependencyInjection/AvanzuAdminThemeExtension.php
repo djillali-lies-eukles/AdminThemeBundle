@@ -123,20 +123,6 @@ class AvanzuAdminThemeExtension extends Extension implements PrependExtensionInt
                     ]
                 );
             }
-
-            if ($config['use_assetic'] && isset($bundles['AsseticBundle'])) {
-                $assets = include dirname(__FILE__) . '/../Resources/config/assets.php';
-
-                $container->prependExtensionConfig(
-                    'assetic',
-                    [
-                        'assets' => $assets,
-                        'bundles' => [
-                            'AvanzuAdminThemeBundle',
-                        ],
-                    ]
-                );
-            }
         }
     }
 }
