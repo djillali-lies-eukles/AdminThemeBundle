@@ -123,7 +123,3 @@ services:
         arguments:
             - "%avanzu_admin_theme.options%"
             - "@avanzu_admin_theme.admin_router"
-
-    Avanzu\AdminThemeBundle\Command\:
-      resource: ../../Command
-      tags: [console.command]
