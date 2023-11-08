@@ -21,7 +21,7 @@ class AvanzuAdminThemeExtension extends Extension implements PrependExtensionInt
     /**
      * {@inheritdoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $baseConfiguration = new Configuration();
 
@@ -76,7 +76,7 @@ class AvanzuAdminThemeExtension extends Extension implements PrependExtensionInt
      *
      * @param ContainerBuilder $container
      */
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         $baseConfiguration = new Configuration();
 

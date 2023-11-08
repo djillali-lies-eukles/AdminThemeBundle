@@ -29,10 +29,9 @@ class BreadcrumbController extends AbstractController
      * If there are no listeners attached for this event, the return value is an empty response.
      *
      * @param Request $request
-     * @param string  $title
-     *
+     * @param string $title
+     * @param EventDispatcherInterface $eventDispatcher
      * @return Response
-     *
      */
     public function breadcrumbAction(Request $request, $title = '', EventDispatcherInterface $eventDispatcher): Response
     {

@@ -17,7 +17,7 @@ class SecurityController extends AbstractController
     /**
      * @param Request $request
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function loginAction(Request $request): Response
     {

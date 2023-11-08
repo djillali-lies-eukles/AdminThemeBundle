@@ -20,7 +20,8 @@ class SidebarController extends AbstractController
 {
     /**
      * Block used in macro avanzu_sidebar_user
-     *  
+     *
+     * @param EventDispatcherInterface $eventDispatcher
      * @return Response
      */
     public function userPanelAction(EventDispatcherInterface $eventDispatcher): Response

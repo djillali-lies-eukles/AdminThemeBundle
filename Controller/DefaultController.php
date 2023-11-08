@@ -23,7 +23,7 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function dashboardAction(): Response
     {
@@ -31,7 +31,7 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function uiGeneralAction(): Response
     {
