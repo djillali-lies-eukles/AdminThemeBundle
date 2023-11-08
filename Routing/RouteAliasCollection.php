@@ -8,58 +8,25 @@
 namespace Avanzu\AdminThemeBundle\Routing;
 
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
 
 class RouteAliasCollection
 {
-    /**
-     * @var string
-     */
-    protected string $cacheDir;
-
-    /**
-     * @var RouterInterface
-     */
-    protected RouterInterface $router;
-
-    /**
-     * @var array|null
-     */
-    protected ?array $routeAliases = null;
-
-    /**
-     * @var string
-     */
-    protected string $optionName;
-
-    /**
-     * @var string
-     */
-    protected string $env;
-
-    /**
-     * @var boolean
-     */
-    private bool $debug;
 
     /**
      * RouteAliasCollection constructor.
-     *
-     * @param                 $cacheDir
-     * @param RouterInterface $router
-     * @param                 $optionName
-     * @param                 $env
-     * @param                 $debug
      */
-    public function __construct($cacheDir, RouterInterface $router, $optionName, $env, $debug)
-    {
-        $this->cacheDir = $cacheDir;
-        $this->router = $router;
-        $this->optionName = $optionName;
-        $this->debug = $debug;
-        $this->env = $env;
+    public function __construct(
+        protected string $cacheDir,
+        protected RouterInterface $router,
+        protected ?array $routeAliases = null,
+        protected string $optionName,
+        protected string $env,
+        private bool $debug
+    ){
     }
 
     /**
@@ -76,7 +43,7 @@ class RouteAliasCollection
     }
 
     /**
-     * @return \Symfony\Component\Config\Resource\ResourceInterface[]
+     * @return ResourceInterface[]
      */
     public function getResources(): array
     {
@@ -99,7 +66,7 @@ class RouteAliasCollection
      *
      * @return mixed
      */
-    public function getRouteByAlias($name)
+    public function getRouteByAlias($name): mixed
     {
         $aliases = $this->getAliases();
         return isset($aliases[$name]) ? $aliases[$name] : NULL;
@@ -108,7 +75,7 @@ class RouteAliasCollection
     /**
      * @return array|mixed
      */
-    public function getAliases()
+    public function getAliases(): mixed
     {
         if (!is_null($this->routeAliases)) {
             return $this->routeAliases;

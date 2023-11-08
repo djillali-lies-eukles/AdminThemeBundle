@@ -14,25 +14,15 @@ use Twig\TwigFilter;
 
 class AvanzuAdminExtension extends AbstractExtension
 {
-    protected $options;
-    protected $env;
-    /**
-     * @var RouteAliasCollection
-     */
-    private $aliasRouter;
 
     /**
      * AvanzuAdminExtension constructor.
-     *
-     * @param                      $options
-     * @param                      $env
-     * @param RouteAliasCollection $aliasRouter
      */
-    public function __construct($options, $env, RouteAliasCollection $aliasRouter)
-    {
-        $this->options = $options;
-        $this->env = $env;
-        $this->aliasRouter = $aliasRouter;
+    public function __construct(
+        private array $options,
+        private string $env,
+        private RouteAliasCollection $aliasRouter
+    ){
     }
 
     public function getFilters(): array

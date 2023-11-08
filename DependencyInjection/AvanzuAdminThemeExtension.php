@@ -41,7 +41,6 @@ class AvanzuAdminThemeExtension extends Extension implements PrependExtensionInt
         if(!empty($config))
         {
             // Set the parameters from config files
-            $container->setParameter('avanzu_admin_theme.bower_bin', (string) (isset($config['bower_bin']) ? $config['bower_bin'] : ''));
             $container->setParameter('avanzu_admin_theme.use_twig', (bool) (isset($config['use_twig']) ? $config['use_twig'] : FALSE));
             $container->setParameter('avanzu_admin_theme.options', (array) (isset($config['options']) ? $config['options'] : []));
         }
@@ -105,7 +104,6 @@ class AvanzuAdminThemeExtension extends Extension implements PrependExtensionInt
         if(!empty($config))
         {
             // Set the parameters from config files
-            $container->setParameter('avanzu_admin_theme.bower_bin', (string) (isset($config['bower_bin']) ? $config['bower_bin'] : ''));
             $container->setParameter('avanzu_admin_theme.use_twig', (bool) (isset($config['use_twig']) ? $config['use_twig'] : FALSE));
 
             // Get all the bundles
