@@ -1,20 +1,14 @@
 {
-    "name": "avanzu/admin-theme-bundle",
+    "name": "ldjillali/admin-theme-bundle",
     "type": "symfony-bundle",
     "description": "Admin Theme based on the AdminLTE Template for easy integration into symfony",
     "license": "MIT",
     "authors": [
         {
-            "name": "Marc Bach",
-            "email": "mail@avanzu.de",
-            "homepage": "http://www.avanzu.de",
-            "role": "Original Author"
-        },
-        {
-            "name": "Ángel Guzmán Maeso",
-            "email": "shakaran@gmail.com",
-            "homepage": "https://shakaran.net/blog",
-            "role": "Developer Collaborator"
+            "name": "Lies DJILLALI",
+            "email": "lies.djillali@tekoway.com",
+            "homepage": "https://www.tekoway.com",
+            "role": "Fork Author"
         }
     ],
     "minimum-stability": "dev",
