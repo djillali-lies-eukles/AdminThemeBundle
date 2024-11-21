@@ -46,13 +46,12 @@ class FetchVendorCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $bowerResource = $this->kernel->locateResource('@AvanzuAdminThemeBundle/Resources/bower');
-        $helper = $this->getHelperSet()->get('formatter');
         /** @var $helper FormatterHelper */
-        $bower = $this->params->get('avanzu_admin_theme.bower_bin');
+        $helper = $this->getHelperSet()->get('formatter');
 
         $action = $input->getOption('update') ? 'update' : 'install';
         $asRoot = $input->getOption('root') ? '--allow-root' : '';
-        $process = new Process([$bower, $action, $asRoot]);
+        $process = new Process(["npx", "bower", $action, $asRoot]);
         $process->setTimeout(600);
 
         $output->writeln($helper->formatSection('Executing', $process->getCommandLine(), 'comment'));
