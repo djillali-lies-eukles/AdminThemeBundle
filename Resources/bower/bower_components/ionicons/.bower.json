@@ -1,0 +1,14 @@
+{
+  "name": "ionicons",
+  "homepage": "https://github.com/driftyco/ionicons",
+  "version": "7.4.0",
+  "_release": "7.4.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v7.4.0",
+    "commit": "04990b96e951a5a3e1755bf80cf90ed893b6823e"
+  },
+  "_source": "https://github.com/driftyco/ionicons.git",
+  "_target": "*",
+  "_originalSource": "ionicons"
+}
