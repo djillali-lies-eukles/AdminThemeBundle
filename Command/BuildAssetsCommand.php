@@ -20,10 +20,10 @@ use Symfony\Component\Process\Process;
 
 class BuildAssetsCommand extends Command
 {
-    const DEFAULT_UGLIFY_JS_LINUX = '/usr/bin/env uglifyjs';
+    const DEFAULT_UGLIFY_JS_LINUX = '/var/www/node_modules/uglify-js/bin/uglifyjs';
     const DEFAULT_UGLIFY_JS_WIN   = 'uglifyjs.exe';
 
-    const DEFAULT_UGLIFY_CSS_LINUX = '/usr/bin/env uglifycss';
+    const DEFAULT_UGLIFY_CSS_LINUX = '/var/www/node_modules/uglifycss/uglifycss';
     const DEFAULT_UGLIFY_CSS_WIN   = 'uglifycss.exe';
 
     protected static $defaultName = 'avanzu:admin:build-assets';
@@ -186,22 +186,25 @@ class BuildAssetsCommand extends Command
         $command = [$in->getOption('uglifyjs-bin')];
         if($in->getOption('compress'))
             $command[] = "-c 'dead_code,drop_debugger,drop_console,keep_fargs,unused=false,properties=false'";
-            if($in->getOption('mangle'))
-                $command[] = '-m';
+        if($in->getOption('mangle'))
+            $command[] = '-m';
 
-                $command[] = "-o $file";
-                $command[] = implode(' ', $files);
+        foreach ($files as $separateFileName) {
+            $command[] = $separateFileName;
+        }
+        $command[] = "-o";
+        $command[] = $file;
 
-                $proc = new Process($command);
+        $proc = new Process($command);
 
-                $out->writeln($proc->getCommandLine() . PHP_EOL);
-                $proc->run(function ($type, $buffer) use ($in, $out) {
-                    if (Process::ERR === $type) {
-                        $out->write("<comment>$buffer</comment>");
-                    } else {
-                        $out->writeln($buffer);
-                    }
-                });
+        $out->writeln($proc->getCommandLine() . PHP_EOL);
+        $proc->run(function ($type, $buffer) use ($in, $out) {
+            if (Process::ERR === $type) {
+                $out->write("<comment>$buffer</comment>");
+            } else {
+                $out->writeln($buffer);
+            }
+        });
     }
 
     /**
@@ -219,8 +222,11 @@ class BuildAssetsCommand extends Command
         $this->filesystem->exists($dir) or $this->filesystem->mkdir($dir);
 
         $command = [$in->getOption('uglifycss-bin')];
-        $command[] = implode(' ', $files);
-        $command[] = "> $file";
+        foreach ($files as $separateFileName) {
+            $command[] = $separateFileName;
+        }
+        $command[] = "--output";
+        $command[] = $file;
 
         $proc = new Process($command);
 
